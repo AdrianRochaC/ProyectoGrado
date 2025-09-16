@@ -1,0 +1,704 @@
+/* Modernización AdminBitacora - estilo profesional tipo Home/Bitacora */
+.admin-body {
+  background: var(--gradient-primary);
+  min-height: 100vh;
+  min-width: 100vw;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bitacora-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 2rem 2rem;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+.admin-body.bitacora-container {
+  margin: 0 auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  transition: margin-left 0.22s cubic-bezier(.4,0,.2,1);
+  width: 70%;
+  max-width: 1100px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding-left: 0.1rem;
+  padding-right: 0.1rem;
+  display: block;
+}
+
+.bitacora-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.2rem;
+  background: var(--bg-card);
+  padding: 2rem 3rem;
+  border-radius: var(--radius-xl);
+  border: 1.5px solid var(--border-primary);
+  box-shadow: var(--shadow-card);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bitacora-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.btn-primary {
+  background: var(--gradient-success);
+  color: var(--text-white);
+  border: none;
+  padding: 0.8rem 1.7rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(67, 233, 123, 0.13);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(67, 233, 123, 0.18);
+}
+
+.bitacora-container > p {
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: var(--radius-medium);
+  border: 1px solid var(--border-primary);
+  max-width: 400px;
+  margin: 2rem auto;
+  box-shadow: var(--shadow-card);
+}
+
+.bitacora-columns {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.2rem;
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bitacora-column {
+  flex: 1 1 300px;
+  min-width: 300px;
+  background: var(--bg-card-hover);
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-light);
+  padding: 1rem;
+  margin-bottom: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  transition: box-shadow 0.18s, border-color 0.18s;
+  border: 1.5px solid var(--border-primary);
+  box-sizing: border-box;
+}
+
+.titulo-columna {
+  font-size: 1.05rem;
+  margin-bottom: 0.8rem;
+  padding: 7px 0;
+  border-radius: var(--radius-small);
+  text-align: center;
+  color: var(--text-white);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.status-rojo {
+  background: var(--gradient-danger);
+}
+.status-amarillo {
+  background: var(--gradient-warning);
+  color: var(--text-white);
+}
+.status-verde {
+  background: var(--gradient-success);
+}
+
+/* Títulos de tareas con colores según estado */
+.admin-status-rojo .admin-tarea-title {
+  background: var(--gradient-danger);
+  color: var(--text-white);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+.admin-status-amarillo .admin-tarea-title {
+  background: var(--gradient-warning);
+  color: var(--text-white);
+  box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+.admin-status-verde .admin-tarea-title {
+  background: var(--gradient-success);
+  color: var(--text-white);
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+.admin-tarea-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: var(--radius-small);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.8rem;
+  text-align: center;
+  letter-spacing: -0.3px;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--text-muted);
+  color: var(--text-white);
+  transition: all 0.3s ease;
+}
+
+.admin-tarea-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-medium);
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 2px solid var(--border-primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: visible;
+  animation: fadeInCard 0.7s cubic-bezier(.4,0,.2,1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Bordes coloridos según estado */
+.admin-status-rojo {
+  border-left: 5px solid var(--text-danger);
+}
+.admin-status-amarillo {
+  border-left: 5px solid var(--text-warning);
+}
+.admin-status-verde {
+  border-left: 5px solid var(--text-success);
+}
+
+.admin-tarea-card:hover {
+  box-shadow: var(--shadow-heavy);
+  border-color: var(--border-focus);
+  transform: translateY(-3px) scale(1.02);
+  background: var(--bg-card-hover);
+}
+
+.admin-tarea-card h3 {
+  font-size: 0.98rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.5px;
+}
+
+.admin-tarea-card p {
+  color: var(--text-secondary);
+  font-size: 0.89rem;
+  line-height: 1.4;
+  margin-bottom: 0.3rem;
+  font-weight: 400;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 25px;
+  margin-bottom: 0.3rem;
+  transition: all 0.3s ease;
+}
+
+.admin-status-verde .admin-badge {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--text-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.admin-status-amarillo .admin-badge {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--text-warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.admin-status-rojo .admin-badge {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--text-danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.admin-tarea-card small {
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: block;
+  margin-top: 0.1rem;
+  opacity: 0.8;
+}
+
+/* Información de tareas mejorada */
+.tarea-info {
+  margin: 0.8rem 0;
+}
+
+.info-item {
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.asignados-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+}
+
+.asignado-badge {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: var(--text-white);
+  padding: 0.2rem 0.6rem;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.3s ease;
+}
+
+.asignado-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.no-asignados {
+  color: var(--text-light);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+/* Modal mejorado */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+/* Mejora para selección de usuarios - más bonita */
+.usuarios-checkboxes {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-medium);
+  padding: 0.8rem;
+  background: linear-gradient(135deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+  box-shadow: inset 0 2px 8px rgba(60,72,88,0.05);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-small);
+  margin-bottom: 0.3rem;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.checkbox-label:hover {
+  background: linear-gradient(135deg, rgba(67, 233, 123, 0.08) 0%, rgba(56, 249, 215, 0.08) 100%);
+  border-color: rgba(67, 233, 123, 0.3);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(67, 233, 123, 0.15);
+}
+
+.checkbox-label.selected {
+  background: linear-gradient(135deg, rgba(67, 233, 123, 0.15) 0%, rgba(56, 249, 215, 0.15) 100%);
+  border-color: var(--border-focus);
+  color: var(--text-success);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(67, 233, 123, 0.2);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
+  position: relative;
+  appearance: none;
+  background: var(--bg-card);
+  border: 2px solid var(--border-secondary);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+  background: var(--gradient-success);
+  border-color: var(--border-focus);
+  transform: scale(1.1);
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--text-white);
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.checkbox-label input[type="checkbox"]:hover {
+  border-color: var(--border-focus);
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px rgba(67, 233, 123, 0.1);
+}
+
+.checkbox-label span {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.checkbox-label:hover span {
+  color: var(--text-success);
+}
+
+.no-usuarios {
+  text-align: center;
+  color: var(--text-light);
+  font-style: italic;
+  padding: 2rem 1rem;
+  background: rgba(149, 165, 166, 0.05);
+  border-radius: var(--radius-small);
+  border: 2px dashed var(--border-secondary);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: var(--text-white);
+  border: none;
+  padding: 0.8rem 1.7rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(149, 165, 166, 0.4);
+}
+
+.card-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.2rem;
+  justify-content: center;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border-primary);
+}
+
+/* BOTONES EDITAR Y BORRAR CORREGIDOS */
+.btn-edit {
+  background: var(--gradient-info);
+  color: var(--text-white);
+  border: none;
+  padding: 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.btn-edit:hover {
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 6px 18px rgba(52, 152, 219, 0.4);
+  background: linear-gradient(135deg, #2980b9, #1f5582);
+}
+
+.btn-edit:active {
+  transform: translateY(-1px) scale(1.05);
+  transition: all 0.1s ease;
+}
+
+.btn-delete {
+  background: var(--gradient-danger);
+  color: var(--text-white);
+  border: none;
+  padding: 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.btn-delete:hover {
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 6px 18px rgba(231, 76, 60, 0.4);
+  background: linear-gradient(135deg, #c0392b, #a93226);
+}
+
+.btn-delete:active {
+  transform: translateY(-1px) scale(1.05);
+  transition: all 0.1s ease;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(10px) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 9999999 !important;
+  animation: fadeIn 0.3s ease;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* Asegurar que el modal esté por encima de todo */
+.modal-overlay * {
+  z-index: inherit !important;
+}
+
+.modal-content {
+  background: var(--bg-card) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: 2.2rem !important;
+  max-width: 500px !important;
+  width: 90% !important;
+  border: 1.5px solid var(--border-primary) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+  position: relative !important;
+  z-index: 10000000 !important;
+  transform: translateZ(0) !important;
+  animation: modalSlideIn 0.4s ease-out !important;
+}
+
+.modal-content h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.2rem;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-small);
+  border: 1.5px solid var(--border-input);
+  font-size: 1rem;
+  resize: vertical;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  outline: 2px solid var(--border-focus);
+  border-color: var(--border-focus);
+}
+
+.modal-content textarea {
+  min-height: 70px;
+  max-height: 200px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.2rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(-50px) scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 1200px) {
+  .admin-body.bitacora-container {
+    margin: 0 auto;
+    width: 90vw;
+    max-width: 98vw;
+    padding: 0.7rem 0.1rem 0.7rem 0.1rem;
+  }
+  .bitacora-columns {
+    flex-direction: column;
+    gap: 1.2rem;
+    width: 100%;
+  }
+  .bitacora-column {
+    min-width: 0;
+    width: 100%;
+    padding: 1rem 0.5rem 1rem 0.5rem;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-body.bitacora-container {
+    margin: 0 auto;
+    width: 98vw;
+    max-width: 100vw;
+    padding: 0.7rem 0.05rem 0.7rem 0.05rem;
+  }
+  .bitacora-container {
+    padding: 1.2rem;
+  }
+  .bitacora-header {
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.2rem 1rem;
+  }
+  .bitacora-columns {
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .bitacora-column {
+    min-width: 0;
+    padding: 1rem 0.5rem 1rem 0.5rem;
+  }
+  .modal-content {
+    padding: 1.1rem !important;
+    width: 95% !important;
+    max-width: 450px !important;
+  }
+  .modal-overlay {
+    z-index: 9999999 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .bitacora-container {
+    padding: 1rem;
+  }
+  .bitacora-header h1 {
+    font-size: 1.3rem;
+  }
+  .admin-tarea-card {
+    padding: 1.1rem;
+  }
+  .modal-content {
+    padding: 0.7rem !important;
+    width: 98% !important;
+    max-width: 400px !important;
+    margin: 1rem !important;
+  }
+  .modal-overlay {
+    z-index: 9999999 !important;
+    padding: 1rem !important;
+  }
+  .btn-edit, .btn-delete {
+    width: 40px;
+    height: 40px;
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-body.bitacora-container {
+    margin: 0;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 0.2rem 0.01rem 0.2rem 0.01rem;
+  }
+  .bitacora-column {
+    min-width: 250px;
+  }
+}

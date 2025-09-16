@@ -1,0 +1,119 @@
+.main-menu {
+  background: var(--bg-menu);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Segoe UI", sans-serif;
+  box-shadow: var(--shadow-light);
+  border-bottom: 1px solid var(--border-primary);
+  transition: all 0.3s ease;
+}
+
+.main-menu ul {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.main-menu a {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-small);
+}
+
+.main-menu a:hover {
+  color: var(--text-white);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+}
+
+.menu-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.logout-btn {
+  background: var(--gradient-danger);
+  color: var(--text-white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-small);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.logout-btn:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Botón de personalización */
+.personalization-btn {
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: var(--shadow-light) !important;
+}
+
+.personalization-btn:hover {
+  transform: scale(1.1) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-menu {
+    padding: 1rem;
+  }
+  
+  .main-menu ul {
+    gap: 1rem;
+  }
+  
+  .auth-buttons {
+    gap: 0.5rem;
+  }
+  
+  .user-info {
+    display: none;
+  }
+}
