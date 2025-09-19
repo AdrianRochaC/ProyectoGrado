@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
 import './AdminDocumentos.css'; // Asegúrate de crear este archivo para los estilos
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const API_URL = 'http://localhost:3001';
 
@@ -13,13 +13,11 @@ const AdminDocumentos = () => {
   const [uploadSuccess, setUploadSuccess] = useState('');
   const [documents, setDocuments] = useState([]);
   const [loadingDocs, setLoadingDocs] = useState(false);
-  // Paso 1: Estados para usuarios y roles
-  const [users, setUsers] = useState([]);
+  // Estados para cargos (roles)
   const [roles, setRoles] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   // Estados para selección
   const [selectedRoles, setSelectedRoles] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [isGlobal, setIsGlobal] = useState(false);
 
   // Estados para edición
@@ -28,7 +26,6 @@ const AdminDocumentos = () => {
   const [editFile, setEditFile] = useState(null);
   const [editName, setEditName] = useState('');
   const [editSelectedRoles, setEditSelectedRoles] = useState([]);
-  const [editSelectedUsers, setEditSelectedUsers] = useState([]);
   const [editIsGlobal, setEditIsGlobal] = useState(false);
 
   // Cargar documentos al montar
@@ -36,33 +33,23 @@ const AdminDocumentos = () => {
     fetchDocuments();
   }, []);
 
-  // Paso 1: Cargar usuarios y roles al abrir el modal
+  // Cargar cargos al abrir el modal
   useEffect(() => {
     if (modalOpen) {
-      fetchUsersAndRoles();
+      fetchCargos();
     }
   }, [modalOpen]);
 
-  const fetchUsersAndRoles = async () => {
+  const fetchCargos = async () => {
     setLoadingUsers(true);
     try {
       const token = localStorage.getItem('authToken');
       
-      // Obtener usuarios
-      const usersRes = await fetch(`${API_URL}/api/usuarios`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const usersData = await usersRes.json();
-      
-      // Obtener cargos (roles) de la base de datos
-      const cargosRes = await fetch(`${API_URL}/api/cargos/activos`, {
+      // Obtener cargos de la base de datos
+      const cargosRes = await fetch(`${API_URL}/api/cargos`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const cargosData = await cargosRes.json();
-      
-      if (usersData.success) {
-        setUsers(usersData.usuarios);
-      }
       
       if (cargosData.success) {
         // Extraer solo los nombres de los cargos
@@ -70,7 +57,6 @@ const AdminDocumentos = () => {
         setRoles(rolesFromDB);
       }
     } catch (err) {
-      setUsers([]);
       setRoles([]);
     } finally {
       setLoadingUsers(false);
@@ -104,14 +90,10 @@ const AdminDocumentos = () => {
   const handleRoleToggle = (role) => {
     setSelectedRoles(prev => prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]);
   };
-  const handleUserToggle = (userId) => {
-    setSelectedUsers(prev => prev.includes(userId) ? prev.filter(u => u !== userId) : [...prev, userId]);
-  };
   const handleGlobalChange = (e) => {
     setIsGlobal(e.target.checked);
     if (e.target.checked) {
       setSelectedRoles([]);
-      setSelectedUsers([]);
     }
   };
 
@@ -121,8 +103,8 @@ const AdminDocumentos = () => {
       setUploadError('Selecciona un archivo');
       return;
     }
-    if (!isGlobal && selectedRoles.length === 0 && selectedUsers.length === 0) {
-      setUploadError('Selecciona al menos un destinatario (rol, usuario o para todos)');
+    if (!isGlobal && selectedRoles.length === 0) {
+      setUploadError('Selecciona al menos un cargo o marca "Para todos"');
       return;
     }
     setUploading(true);
@@ -133,7 +115,6 @@ const AdminDocumentos = () => {
       formData.append('document', file);
       formData.append('is_global', isGlobal);
       formData.append('roles', JSON.stringify(selectedRoles));
-      formData.append('users', JSON.stringify(selectedUsers));
       const token = localStorage.getItem('authToken');
       const res = await fetch(`${API_URL}/api/documents`, {
         method: 'POST',
@@ -145,7 +126,6 @@ const AdminDocumentos = () => {
         setUploadSuccess('Documento subido exitosamente');
         setFile(null);
         setSelectedRoles([]);
-        setSelectedUsers([]);
         setIsGlobal(false);
         fetchDocuments();
         setTimeout(() => {
@@ -175,36 +155,28 @@ const AdminDocumentos = () => {
       });
       const data = await res.json();
       if (data.success) {
-        // Esperar a que usuarios y roles estén cargados
-        if (users.length === 0) {
-          await fetchUsersAndRoles();
+        // Esperar a que roles estén cargados
+        if (roles.length === 0) {
+          await fetchCargos();
         }
         // Normalizar tipos y valores
         const normalizedRoles = (data.roles || []).map(r => String(r).trim());
-        const normalizedUsers = (data.users || []).map(u => String(u));
         setEditSelectedRoles(roles.filter(r => normalizedRoles.includes(r)));
-        setEditSelectedUsers(users.filter(u => normalizedUsers.includes(String(u.id))).map(u => u.id));
       } else {
         setEditSelectedRoles([]);
-        setEditSelectedUsers([]);
       }
     } catch {
       setEditSelectedRoles([]);
-      setEditSelectedUsers([]);
     }
     setEditModalOpen(true);
   };
   const handleEditRoleToggle = (role) => {
     setEditSelectedRoles(prev => prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]);
   };
-  const handleEditUserToggle = (userId) => {
-    setEditSelectedUsers(prev => prev.includes(userId) ? prev.filter(u => u !== userId) : [...prev, userId]);
-  };
   const handleEditGlobalChange = (e) => {
     setEditIsGlobal(e.target.checked);
     if (e.target.checked) {
       setEditSelectedRoles([]);
-      setEditSelectedUsers([]);
     }
   };
   const handleEditFileChange = (e) => {
@@ -213,8 +185,8 @@ const AdminDocumentos = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editName) return;
-    if (!editIsGlobal && editSelectedRoles.length === 0 && editSelectedUsers.length === 0) {
-      setUploadError('Selecciona al menos un destinatario (rol, usuario o para todos)');
+    if (!editIsGlobal && editSelectedRoles.length === 0) {
+      setUploadError('Selecciona al menos un cargo o marca "Para todos"');
       return;
     }
     setUploading(true);
@@ -225,7 +197,6 @@ const AdminDocumentos = () => {
       formData.append('name', editName);
       formData.append('is_global', editIsGlobal);
       formData.append('roles', JSON.stringify(editSelectedRoles));
-      formData.append('users', JSON.stringify(editSelectedUsers));
       if (editFile) formData.append('document', editFile);
       const token = localStorage.getItem('authToken');
       const res = await fetch(`${API_URL}/api/documents/${editingDoc.id}`, {
@@ -248,6 +219,38 @@ const AdminDocumentos = () => {
       setUploadError('Error al actualizar documento');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (docId, docName) => {
+    if (!confirm(`¿Estás seguro de que quieres eliminar el documento "${docName}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${API_URL}/api/documents/${docId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUploadSuccess('Documento eliminado exitosamente');
+        fetchDocuments();
+        setTimeout(() => {
+          setUploadSuccess('');
+        }, 2000);
+      } else {
+        setUploadError(data.message || 'Error al eliminar documento');
+        setTimeout(() => {
+          setUploadError('');
+        }, 3000);
+      }
+    } catch (err) {
+      setUploadError('Error al eliminar documento');
+      setTimeout(() => {
+        setUploadError('');
+      }, 3000);
     }
   };
 
@@ -400,43 +403,6 @@ const AdminDocumentos = () => {
                 )}
               </div>
             </div>
-            {/* Multi-select visual de usuarios */}
-            <div className="doc-multiselect-section">
-              <label style={{ 
-                fontWeight: 600, 
-                color: 'var(--text-primary)', 
-                marginBottom: '8px',
-                display: 'block',
-                fontSize: '0.95rem'
-              }}>
-                Asignar a usuarios:
-              </label>
-              <div className="doc-multiselect-list">
-                {users.map(user => (
-                  <span
-                    key={user.id}
-                    className={`doc-pill ${selectedUsers.includes(user.id) ? 'selected' : ''}`}
-                    onClick={() => !isGlobal && handleUserToggle(user.id)}
-                    style={{ cursor: isGlobal ? 'not-allowed' : 'pointer' }}
-                  >
-                    {user.nombre}{user.rol ? ` [${user.rol}]` : ''}
-                  </span>
-                ))}
-                {users.length === 0 && (
-                  <span style={{ 
-                    color: 'var(--text-muted)', 
-                    fontSize: '0.85rem',
-                    fontStyle: 'italic',
-                    padding: '8px 12px',
-                    background: 'var(--bg-card-hover)',
-                    borderRadius: '6px',
-                    border: '1px dashed var(--border-secondary)'
-                  }}>
-                    No hay usuarios disponibles
-                  </span>
-                )}
-              </div>
-            </div>
             {uploadError && (
               <div style={{ 
                 color: '#dc2626', 
@@ -579,42 +545,6 @@ const AdminDocumentos = () => {
               </div>
             </div>
             
-            <div className="doc-multiselect-section">
-              <label style={{ 
-                fontWeight: 600, 
-                color: 'var(--text-primary)', 
-                marginBottom: '8px',
-                display: 'block',
-                fontSize: '0.95rem'
-              }}>
-                Asignar a usuarios:
-              </label>
-              <div className="doc-multiselect-list">
-                {users.map(user => (
-                  <span
-                    key={user.id}
-                    className={`doc-pill ${editSelectedUsers.includes(user.id) ? 'selected' : ''}`}
-                    onClick={() => !editIsGlobal && handleEditUserToggle(user.id)}
-                    style={{ cursor: editIsGlobal ? 'not-allowed' : 'pointer' }}
-                  >
-                    {user.nombre}{user.rol ? ` [${user.rol}]` : ''}
-                  </span>
-                ))}
-                {users.length === 0 && (
-                  <span style={{ 
-                    color: 'var(--text-muted)', 
-                    fontSize: '0.85rem',
-                    fontStyle: 'italic',
-                    padding: '8px 12px',
-                    background: 'var(--bg-card-hover)',
-                    borderRadius: '6px',
-                    border: '1px dashed var(--border-secondary)'
-                  }}>
-                    No hay usuarios disponibles
-                  </span>
-                )}
-              </div>
-            </div>
             {uploadError && (
               <div style={{ 
                 color: '#dc2626', 
@@ -648,6 +578,42 @@ const AdminDocumentos = () => {
             </button>
           </form>
         </Modal>
+
+        {/* Mensajes globales de éxito/error */}
+        {uploadSuccess && (
+          <div style={{ 
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            background: '#16a34a',
+            color: 'white',
+            padding: '12px 20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(22, 163, 74, 0.3)',
+            zIndex: 1000,
+            fontSize: '0.9rem',
+            fontWeight: '500'
+          }}>
+            ✅ {uploadSuccess}
+          </div>
+        )}
+        {uploadError && (
+          <div style={{ 
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            background: '#dc2626',
+            color: 'white',
+            padding: '12px 20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)',
+            zIndex: 1000,
+            fontSize: '0.9rem',
+            fontWeight: '500'
+          }}>
+            ❌ {uploadError}
+          </div>
+        )}
 
         <div className="document-list-section">
           <h2 style={{ 
@@ -863,6 +829,22 @@ const AdminDocumentos = () => {
                           }}
                         >
                           <FaEdit />
+                        </button>
+                        <button 
+                          className="btn-delete" 
+                          title="Eliminar" 
+                          onClick={() => handleDeleteDocument(doc.id, doc.name)}
+                          style={{
+                            padding: '8px',
+                            background: '#dc2626',
+                            border: 'none',
+                            borderRadius: '8px',
+                            color: 'white',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <FaTrash />
                         </button>
                       </td>
                     </tr>

@@ -224,6 +224,100 @@ app.get('/api/documents/:id/targets', verifyToken, async (req, res) => {
   }
 });
 
+// Endpoint para actualizar un documento
+app.put('/api/documents/:id', verifyToken, documentUpload.single('document'), async (req, res) => {
+  try {
+    const docId = req.params.id;
+    const { name, is_global, roles } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ success: false, message: 'El nombre del documento es requerido' });
+    }
+
+    const connection = await mysql.createConnection(dbConfig);
+    
+    // Verificar que el documento existe
+    const [existingDoc] = await connection.execute(
+      'SELECT * FROM documents WHERE id = ?',
+      [docId]
+    );
+    
+    if (existingDoc.length === 0) {
+      await connection.end();
+      return res.status(404).json({ success: false, message: 'Documento no encontrado' });
+    }
+
+    // Actualizar el documento
+    let updateQuery = 'UPDATE documents SET name = ?';
+    let updateParams = [name];
+    
+    if (req.file) {
+      updateQuery += ', filename = ?, mimetype = ?, size = ?';
+      updateParams.push(req.file.filename, req.file.mimetype, req.file.size);
+    }
+    
+    updateQuery += ' WHERE id = ?';
+    updateParams.push(docId);
+    
+    await connection.execute(updateQuery, updateParams);
+    
+    // Actualizar targets
+    await connection.execute('DELETE FROM document_targets WHERE document_id = ?', [docId]);
+    
+    if (is_global === 'true') {
+      await connection.execute(
+        'INSERT INTO document_targets (document_id, target_type, target_value) VALUES (?, ?, ?)',
+        [docId, 'global', 'all']
+      );
+    } else {
+      const rolesArray = JSON.parse(roles || '[]');
+      for (const role of rolesArray) {
+        await connection.execute(
+          'INSERT INTO document_targets (document_id, target_type, target_value) VALUES (?, ?, ?)',
+          [docId, 'role', role]
+        );
+      }
+    }
+    
+    await connection.end();
+    res.json({ success: true, message: 'Documento actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error actualizando documento:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Endpoint para eliminar un documento
+app.delete('/api/documents/:id', verifyToken, async (req, res) => {
+  try {
+    const docId = req.params.id;
+    const connection = await mysql.createConnection(dbConfig);
+    
+    // Verificar que el documento existe
+    const [existingDoc] = await connection.execute(
+      'SELECT * FROM documents WHERE id = ?',
+      [docId]
+    );
+    
+    if (existingDoc.length === 0) {
+      await connection.end();
+      return res.status(404).json({ success: false, message: 'Documento no encontrado' });
+    }
+
+    // Eliminar targets primero (por las foreign keys)
+    await connection.execute('DELETE FROM document_targets WHERE document_id = ?', [docId]);
+    
+    // Eliminar el documento
+    await connection.execute('DELETE FROM documents WHERE id = ?', [docId]);
+    
+    await connection.end();
+    res.json({ success: true, message: 'Documento eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error eliminando documento:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
 // Configuración de la base de datos
 const dbConfig = {
   host: 'centerbeam.proxy.rlwy.net',
