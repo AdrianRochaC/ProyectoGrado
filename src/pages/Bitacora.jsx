@@ -24,7 +24,6 @@ const Bitacora = () => {
         alert("❌ Error al obtener las tareas");
       }
     } catch (error) {
-      console.error("Error:", error);
       alert("❌ No se pudo cargar la bitácora.");
     } finally {
       setLoading(false);
@@ -39,8 +38,7 @@ const Bitacora = () => {
       const data = await res.json();
       if (data.success) setUsuarios(data.usuarios);
     } catch (e) {
-      console.error("Error al cargar usuarios:", e);
-    }
+      }
   };
 
   const cambiarEstado = async (tarea, nuevoEstado) => {
@@ -60,8 +58,7 @@ const Bitacora = () => {
         alert("❌ " + data.message);
       }
     } catch (error) {
-      console.error("Error al cambiar estado:", error);
-    }
+      }
   };
 
   const getNombreUsuario = (id) => {
@@ -104,7 +101,6 @@ const Bitacora = () => {
               try {
                 return JSON.parse(t.asignados || "[]").includes(user.id);
               } catch (error) {
-                console.warn(`Error parseando asignados para tarea ${t.id}:`, error);
                 return false;
               }
             })()
@@ -138,8 +134,7 @@ const Bitacora = () => {
       const asignados = JSON.parse(tarea.asignados || "[]");
       asignadoId = asignados[0];
     } catch (error) {
-      console.warn(`Error parseando asignados para tarea ${tarea.id}:`, error);
-    }
+      }
                   return (
                     <div
                       key={tarea.id}

@@ -44,7 +44,6 @@ const makeAuthenticatedRequest = async (endpoint, options = {}) => {
 export const getUserPreferences = async () => {
   // Si no está autenticado, usar localStorage
   if (!isAuthenticated()) {
-    console.log('Usuario no autenticado, usando preferencias locales');
     return loadPreferencesFromLocalStorage();
   }
 
@@ -52,7 +51,6 @@ export const getUserPreferences = async () => {
     const response = await makeAuthenticatedRequest('/user-preferences');
     return response.preferences;
   } catch (error) {
-    console.error('Error obteniendo preferencias:', error);
     // Retornar preferencias por defecto si hay error
     return {
       theme: 'dark',
@@ -72,7 +70,6 @@ export const getUserPreferences = async () => {
 export const updateUserPreferences = async (preferences) => {
   // Si no está autenticado, solo guardar en localStorage
   if (!isAuthenticated()) {
-    console.log('Usuario no autenticado, guardando solo en localStorage');
     syncPreferencesWithLocalStorage(preferences);
     return preferences;
   }
@@ -84,7 +81,6 @@ export const updateUserPreferences = async (preferences) => {
     });
     return response.preferences;
   } catch (error) {
-    console.error('Error actualizando preferencias:', error);
     // Si falla la API, guardar en localStorage como respaldo
     syncPreferencesWithLocalStorage(preferences);
     throw error;
@@ -95,7 +91,6 @@ export const updateUserPreferences = async (preferences) => {
 export const resetUserPreferences = async () => {
   // Si no está autenticado, resetear solo localStorage
   if (!isAuthenticated()) {
-    console.log('Usuario no autenticado, reseteando solo localStorage');
     const defaultPreferences = {
       theme: 'dark',
       color_scheme: 'default',
@@ -117,7 +112,6 @@ export const resetUserPreferences = async () => {
     });
     return response.preferences;
   } catch (error) {
-    console.error('Error reseteando preferencias:', error);
     throw error;
   }
 };
@@ -142,7 +136,6 @@ export const syncPreferencesWithLocalStorage = (preferences) => {
       const maxSize = 4 * 1024 * 1024; // 4MB máximo para localStorage
       
       if (base64Size > maxSize) {
-        console.warn('Imagen demasiado grande para localStorage, omitiendo guardado local');
         // No guardar la imagen en localStorage, pero mantener las otras preferencias
         localStorage.setItem('backgroundImageUrl', '');
         localStorage.setItem('backgroundImageTooLarge', 'true');
@@ -157,8 +150,6 @@ export const syncPreferencesWithLocalStorage = (preferences) => {
     
     localStorage.setItem('backgroundColor', preferences.background_color);
   } catch (error) {
-    console.error('Error guardando en localStorage:', error);
-    
     // Si es error de cuota, intentar limpiar localStorage y guardar solo lo esencial
     if (error.name === 'QuotaExceededError') {
       try {
@@ -189,9 +180,7 @@ export const syncPreferencesWithLocalStorage = (preferences) => {
         localStorage.setItem('backgroundColor', basicPreferences.background_color);
         localStorage.setItem('storageCleared', 'true');
         
-        console.log('localStorage limpiado y guardadas preferencias básicas');
-      } catch (cleanupError) {
-        console.error('Error limpiando localStorage:', cleanupError);
+        } catch (cleanupError) {
         throw new Error('No se pudo guardar las preferencias. El almacenamiento local está lleno.');
       }
     } else {
@@ -244,7 +233,6 @@ export const initializePreferences = async () => {
   try {
     // Si no está autenticado, usar localStorage
     if (!isAuthenticated()) {
-      console.log('Usuario no autenticado, inicializando desde localStorage');
       const localPreferences = loadPreferencesFromLocalStorage();
       applyPreferencesToDOM(localPreferences);
       return localPreferences;
@@ -279,7 +267,6 @@ export const initializePreferences = async () => {
     applyPreferencesToDOM(preferences);
     return preferences;
   } catch (error) {
-    console.warn('No se pudo cargar desde DB, usando localStorage:', error);
     // Si falla, usar localStorage como respaldo
     const localPreferences = loadPreferencesFromLocalStorage();
     applyPreferencesToDOM(localPreferences);

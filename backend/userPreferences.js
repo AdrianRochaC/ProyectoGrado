@@ -31,7 +31,6 @@ const getUserPreferences = async (req, res) => {
     const prefs = rows[0];
     res.json({ ...prefs, has_background_image: !!prefs.background_image });
   } catch (error) {
-    console.error('Error obteniendo preferencias:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
@@ -75,7 +74,6 @@ const updateUserPreferences = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error actualizando preferencias:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
@@ -111,7 +109,6 @@ const updateBackgroundImage = [uploadMemory.single('background_image'), async (r
     await connection.end();
     res.json({ message: 'Imagen de fondo actualizada exitosamente' });
   } catch (error) {
-    console.error('Error actualizando imagen de fondo:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 }];
@@ -132,7 +129,6 @@ const getBackgroundImage = async (req, res) => {
     res.set('Content-Type', 'image/jpeg'); // O detecta el tipo real si lo necesitas
     res.send(rows[0].background_image);
   } catch (error) {
-    console.error('Error obteniendo imagen de fondo:', error);
     res.status(500).send('Error interno del servidor');
   }
 };
@@ -162,7 +158,6 @@ const createUserPreferences = async (userId, preferences = null) => {
     return defaultPreferences;
 
   } catch (error) {
-    console.error('Error creando preferencias por defecto:', error);
     throw error;
   }
 };
@@ -197,7 +192,6 @@ const resetUserPreferences = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error reseteando preferencias:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };

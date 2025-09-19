@@ -31,8 +31,7 @@ const AdminBitacora = () => {
       const data = await response.json();
       if (data.success) setUsuarios(data.usuarios || []);
     } catch (error) {
-      console.error("Error al obtener usuarios:", error);
-    }
+      }
   };
 
   const fetchTareas = async () => {
@@ -47,8 +46,7 @@ const AdminBitacora = () => {
         alert("❌ Error al obtener tareas");
       }
     } catch (error) {
-      console.error("Error al obtener tareas:", error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
@@ -86,8 +84,7 @@ const AdminBitacora = () => {
         alert("❌ " + data.message);
       }
     } catch (error) {
-      console.error("Error al guardar tarea:", error);
-    }
+      }
   };
 
   const handleDelete = async (id) => {
@@ -101,8 +98,7 @@ const AdminBitacora = () => {
       if (data.success) fetchTareas();
       else alert("❌ " + data.message);
     } catch (error) {
-      console.error("Error al eliminar tarea:", error);
-    }
+      }
   };
 
   const handleEdit = (tarea) => {
@@ -117,7 +113,6 @@ const AdminBitacora = () => {
             ? tarea.asignados
             : JSON.parse(tarea.asignados || "[]");
         } catch (error) {
-          console.warn(`Error parseando asignados para tarea ${tarea.id}:`, error);
           return [];
         }
       })(),
@@ -186,7 +181,6 @@ const AdminBitacora = () => {
                       ? t.asignados
                       : JSON.parse(t.asignados || "[]");
                   } catch (error) {
-                    console.warn(`Error parseando asignados para tarea ${t.id}:`, error);
                     asignados = [];
                   }
                   return (

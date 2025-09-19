@@ -57,17 +57,9 @@ export async function getCargoMetrics(cargoId) {
       promedioProgreso: Math.round(progresoResult[0].promedio || 0)
     };
     
-    console.log('📊 MÉTRICAS OBTENIDAS PARA CARGO:', cargo.nombre);
-    console.log('  👥 Usuarios:', metrics.totalUsuarios);
-    console.log('  📚 Cursos:', metrics.totalCursos);
-    console.log('  📄 Documentos:', metrics.totalDocumentos);
-    console.log('  📈 Progreso promedio:', metrics.promedioProgreso + '%');
-    console.log('  📋 Resultado completo:', JSON.stringify(metrics, null, 2));
-    
     return metrics;
     
   } catch (error) {
-    console.error('Error obteniendo métricas del cargo:', error);
     throw error;
   }
 }
@@ -162,7 +154,6 @@ export async function getCargoStats(cargoId) {
     };
     
   } catch (error) {
-    console.error('Error obteniendo estadísticas del cargo:', error.message);
     throw error;
   }
 }
@@ -189,7 +180,6 @@ export async function getAllCargosStats() {
     `);
     return cargos;
   } catch (error) {
-    console.error('Error obteniendo estadísticas de todos los cargos:', error.message);
     throw error;
   }
 }

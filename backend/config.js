@@ -74,10 +74,8 @@ export function validateConfig() {
   });
   
   if (missing.length > 0) {
-    console.warn('⚠️ Configuración incompleta. Las siguientes variables son requeridas:');
-    missing.forEach(key => console.warn(`   - ${key}`));
-    console.warn('   El servicio de IA no funcionará correctamente.');
-  }
+    missing.forEach(key => );
+    }
   
   return missing.length === 0;
 }

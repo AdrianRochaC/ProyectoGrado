@@ -16,8 +16,7 @@ const openai = new OpenAI({
 class AIService {
   constructor() {
     if (!process.env.OPENAI_API_KEY) {
-      console.warn('⚠️ OPENAI_API_KEY no configurada. El servicio de IA no funcionará.');
-    }
+      }
   }
 
   /**
@@ -36,8 +35,6 @@ class AIService {
       
       // Crear prompt contextual para OpenAI
       const prompt = this.createPrompt(title, description, content, contentType, numQuestions);
-      
-      console.log('🤖 Generando preguntas con IA para:', title);
       
       const completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -58,11 +55,9 @@ class AIService {
       const response = completion.choices[0].message.content;
       const questions = this.parseAIResponse(response);
       
-      console.log(`✅ Generadas ${questions.length} preguntas con IA`);
       return questions;
       
     } catch (error) {
-      console.error('❌ Error generando preguntas con IA:', error);
       throw error;
     }
   }
@@ -170,7 +165,6 @@ IMPORTANTE: Solo responde con el JSON válido, sin texto adicional. Asegúrate d
       );
       
     } catch (error) {
-      console.error('❌ Error parseando respuesta de IA:', error);
       throw new Error('Respuesta de IA malformada');
     }
   }
@@ -180,8 +174,6 @@ IMPORTANTE: Solo responde con el JSON válido, sin texto adicional. Asegúrate d
    */
   async extractYouTubeTranscript(videoUrl) {
     try {
-      console.log('📹 Procesando video de YouTube con transcripción real:', videoUrl);
-      
       // Usar el procesador de video para obtener transcripción real
       const videoData = await videoProcessor.processYouTubeVideo(videoUrl);
       
@@ -226,7 +218,6 @@ Basándote en la transcripción real del video de YouTube, genera preguntas de e
       };
       
     } catch (error) {
-      console.error('❌ Error procesando video de YouTube:', error);
       throw error;
     }
   }
@@ -236,8 +227,6 @@ Basándote en la transcripción real del video de YouTube, genera preguntas de e
    */
   async processMP4WithTranscription(filePath) {
     try {
-      console.log('🎬 Procesando archivo MP4 con transcripción real:', filePath);
-      
       // Usar el procesador de video para obtener transcripción real
       const videoData = await videoProcessor.processMP4Video(filePath);
       
@@ -276,7 +265,6 @@ Basándote en la transcripción real del archivo de video, genera preguntas de e
       };
       
     } catch (error) {
-      console.error('❌ Error procesando archivo MP4:', error);
       throw error;
     }
   }
@@ -286,8 +274,6 @@ Basándote en la transcripción real del archivo de video, genera preguntas de e
    */
   async analyzeFileContent(filePath) {
     try {
-      console.log('📄 Analizando contenido del archivo:', filePath);
-      
       const fileName = path.basename(filePath);
       const fileExtension = path.extname(filePath).toLowerCase();
       
@@ -315,8 +301,7 @@ Basándote en la transcripción real del archivo de video, genera preguntas de e
           content += `\nFecha de modificación: ${modifiedDate}`;
           content += `\nExtensión: ${fileExtension.toUpperCase()}`;
         } catch (statsError) {
-          console.warn('⚠️ No se pudo obtener estadísticas del archivo:', statsError.message);
-        }
+          }
         
         content += '\n\nINSTRUCCIONES PARA LA IA: Basándote en el nombre del archivo de video y sus metadatos, genera preguntas de evaluación que cubran los temas principales que se podrían tratar en un video educativo de este tipo. Considera que es contenido audiovisual educativo.';
       } else {
@@ -332,7 +317,6 @@ Basándote en la transcripción real del archivo de video, genera preguntas de e
       };
       
     } catch (error) {
-      console.error('❌ Error analizando archivo:', error);
       throw error;
     }
   }
@@ -378,7 +362,6 @@ Basándote en la transcripción real del archivo de video, genera preguntas de e
       return questions;
       
     } catch (error) {
-      console.error('❌ Error generando preguntas para el curso:', error);
       throw error;
     }
   }
@@ -408,10 +391,7 @@ Basándote en la transcripción real del archivo de video, genera preguntas de e
         );
       }
       
-      console.log(`✅ ${questions.length} preguntas guardadas en la base de datos`);
-      
-    } catch (error) {
-      console.error('❌ Error guardando preguntas en la base de datos:', error);
+      } catch (error) {
       throw error;
     }
   }

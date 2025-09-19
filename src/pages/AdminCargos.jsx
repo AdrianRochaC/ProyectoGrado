@@ -14,6 +14,7 @@ const AdminCargos = () => {
   const [editingCargo, setEditingCargo] = useState(null);
   const [selectedCargo, setSelectedCargo] = useState(null);
   const [cargoMetrics, setCargoMetrics] = useState(null);
+  const [generatingReport, setGeneratingReport] = useState(false);
   
   // Estados para el formulario de creación
   const [nombre, setNombre] = useState('');
@@ -30,37 +31,26 @@ const AdminCargos = () => {
   const fetchCargos = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      console.log('🔍 Fetching cargos...');
-      console.log('🔑 Token:', token ? 'Presente' : 'Ausente');
-      
       const response = await fetch(`${API_URL}/api/cargos`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
-      console.log('📡 Response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('📦 Data recibida:', data);
-        console.log('📋 Cargos:', data.cargos);
         setCargos(data.cargos || []);
       } else {
-        console.error('❌ Error obteniendo cargos:', response.status);
         const errorData = await response.json();
-        console.error('❌ Error details:', errorData);
-      }
+        }
     } catch (error) {
-      console.error('💥 Error:', error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
 
   const fetchCargoMetrics = async (cargoId) => {
     try {
-      console.log('🔍 FRONTEND: Solicitando métricas para cargo ID:', cargoId);
       const token = localStorage.getItem('authToken');
       const response = await fetch(`${API_URL}/api/cargos/${cargoId}/metrics`, {
         headers: {
@@ -70,14 +60,10 @@ const AdminCargos = () => {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('📊 FRONTEND: Datos recibidos del servidor:', JSON.stringify(data, null, 2));
-        console.log('📊 FRONTEND: Métricas específicas:', JSON.stringify(data.metrics, null, 2));
         setCargoMetrics(data.metrics);
-      } else {
-        console.error('❌ FRONTEND: Error obteniendo métricas del cargo');
       }
     } catch (error) {
-      console.error('❌ FRONTEND: Error:', error);
+      // Error cargando métricas
     }
   };
 
@@ -91,7 +77,6 @@ const AdminCargos = () => {
 
     try {
       const token = localStorage.getItem('authToken');
-      console.log('🚀 Creando cargo:', { nombre: nombre.trim(), descripcion: descripcion.trim() });
       
       const response = await fetch(`${API_URL}/api/cargos`, {
         method: 'POST',
@@ -105,11 +90,8 @@ const AdminCargos = () => {
         })
       });
 
-      console.log('📡 Response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Cargo creado:', data);
         alert(data.message);
         setModalOpen(false);
         resetForm();
@@ -119,7 +101,6 @@ const AdminCargos = () => {
         alert(errorData.message || 'Error creando cargo');
       }
     } catch (error) {
-      console.error('Error:', error);
       alert('Error interno del servidor');
     }
   };
@@ -157,7 +138,6 @@ const AdminCargos = () => {
         alert(errorData.message || 'Error actualizando cargo');
       }
     } catch (error) {
-      console.error('Error:', error);
       alert('Error interno del servidor');
     }
   };
@@ -185,7 +165,6 @@ const AdminCargos = () => {
         alert(errorData.message || 'Error eliminando cargo');
       }
     } catch (error) {
-      console.error('Error:', error);
       alert('Error interno del servidor');
     }
   };
@@ -208,31 +187,72 @@ const AdminCargos = () => {
     setDescripcion('');
   };
 
-  const downloadCargoReport = (cargo) => {
-    // Crear un reporte simple en formato CSV
-    const reportData = [
-      ['Reporte del Cargo: ' + cargo.nombre],
-      [''],
-      ['Descripción:', cargo.descripcion],
-      ['Fecha de Creación:', new Date(cargo.created_at).toLocaleDateString('es-CO')],
-      [''],
-      ['Métricas:'],
-      ['Total de Usuarios:', cargoMetrics?.totalUsuarios || 0],
-      ['Cursos Asignados:', cargoMetrics?.totalCursos || 0],
-      ['Documentos Asignados:', cargoMetrics?.totalDocumentos || 0],
-      ['Promedio de Progreso:', cargoMetrics?.promedioProgreso || 0 + '%']
-    ];
+  const downloadCargoReport = async (cargo) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      
+      const response = await fetch(`${API_URL}/api/cargos/${cargo.id}/reporte-excel`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-    const csvContent = reportData.map(row => row.join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `reporte_${cargo.nombre.replace(/\s+/g, '_')}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Reporte_${cargo.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        alert('✅ Reporte individual generado exitosamente');
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Error: ${errorData.message || 'Error generando reporte individual'}`);
+      }
+    } catch (error) {
+      alert('❌ Error generando reporte individual');
+    }
+  };
+
+  // Función para generar reporte Excel
+  const generateExcelReport = async () => {
+    try {
+      setGeneratingReport(true);
+      const token = localStorage.getItem('authToken');
+      
+      const response = await fetch(`${API_URL}/api/cargos/reporte-excel`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Reporte_Cargos_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        alert('✅ Reporte Excel generado exitosamente');
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Error: ${errorData.message || 'Error generando reporte'}`);
+      }
+    } catch (error) {
+      alert('❌ Error generando reporte Excel');
+    } finally {
+      setGeneratingReport(false);
+    }
   };
 
   if (loading) {
@@ -257,10 +277,20 @@ const AdminCargos = () => {
         >
           <FaPlus /> Crear Nuevo Cargo
         </button>
+        
+        <button 
+          className="btn-success"
+          onClick={generateExcelReport}
+          disabled={generatingReport}
+          style={{ marginLeft: '10px' }}
+        >
+          <FaDownload /> 
+          {generatingReport ? 'Generando...' : 'Reporte Excel'}
+        </button>
       </div>
 
       <div className="admin-cargos-content">
-        {console.log('🔍 Renderizando cargos:', cargos)}
+        {}
         <div className="cargos-grid">
           {cargos.map((cargo) => (
             <div key={cargo.id} className="cargo-card" onClick={() => openDetailModal(cargo)}>

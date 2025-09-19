@@ -39,7 +39,6 @@ const Menu = () => {
     });
     const data = await res.json();
     if (data.success) {
-      console.log('Notificaciones del usuario:', data.notifications);
       setNotifications(data.notifications);
       setUnreadCount(data.notifications.filter(n => !n.is_read).length);
     }

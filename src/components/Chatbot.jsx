@@ -4,6 +4,7 @@ import { MessageCircle, X, Send, Clock, User, Bot } from 'lucide-react';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +61,7 @@ const Chatbot = () => {
         }
       }
     } catch (error) {
-      console.error('Error cargando historial:', error);
+      // Error cargando historial
     }
   };
 
@@ -127,8 +128,6 @@ const Chatbot = () => {
         throw new Error('Error en la petición al chatbot');
       }
     } catch (error) {
-      console.error('Error enviando mensaje:', error);
-      
       // Mostrar mensaje de error
       const errorMessage = {
         id: `error-${Date.now()}`,
@@ -157,7 +156,7 @@ const Chatbot = () => {
         })
       });
     } catch (error) {
-      console.error('Error guardando conversación:', error);
+      // Error guardando conversación
     }
   };
 
@@ -176,9 +175,17 @@ const Chatbot = () => {
   };
 
   const toggleChatbot = () => {
-    setIsOpen(!isOpen);
-    if (!isOpen) {
-      setShowHistory(false);
+    if (isOpen) {
+      // Cerrar con animación
+      setIsClosing(true);
+      setTimeout(() => {
+        setIsOpen(false);
+        setIsClosing(false);
+        setShowHistory(false);
+      }, 300);
+    } else {
+      // Abrir
+      setIsOpen(true);
     }
   };
 
@@ -200,7 +207,7 @@ const Chatbot = () => {
 
       {/* Ventana del chatbot */}
       {isOpen && (
-        <div className="chatbot-container">
+        <div className={`chatbot-container ${isClosing ? 'closing' : ''}`}>
           <div className="chatbot-header">
             <div className="chatbot-title">
               <Bot size={20} />

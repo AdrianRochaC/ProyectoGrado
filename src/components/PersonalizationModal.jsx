@@ -54,7 +54,6 @@ const PersonalizationModal = ({ isOpen, onClose }) => {
       await updateUserPreferences(preferences);
       setError(null);
     } catch (error) {
-      console.error('Error guardando preferencias:', error);
       if (authStatus.isAuthenticated) {
         setError('No se pudieron guardar las preferencias en el servidor. Los cambios se mantendrán localmente.');
       }

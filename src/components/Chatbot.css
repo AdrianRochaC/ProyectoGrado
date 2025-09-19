@@ -1,8 +1,8 @@
 /* Chatbot Styles */
 .chatbot-toggle {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 30px;
+  right: 30px;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -14,34 +14,95 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  z-index: 1001;
   transition: all 0.3s ease;
 }
 
 .chatbot-toggle:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+.chatbot-toggle.open:hover {
+  transform: rotate(180deg) scale(1.05);
+}
+
+/* Efecto de pulso para llamar la atención */
+.chatbot-toggle:not(.open) {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4), 0 0 0 10px rgba(102, 126, 234, 0.1);
+  }
+  100% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .chatbot-toggle.open {
   background: #e74c3c;
   transform: rotate(180deg);
+  z-index: 1002;
+  animation: none; /* Desactivar pulso cuando está abierto */
+}
+
+/* Asegurar que el botón siempre esté visible */
+.chatbot-toggle {
+  position: fixed !important;
+  bottom: 30px !important;
+  right: 30px !important;
+  z-index: 1001 !important;
 }
 
 .chatbot-container {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
+  position: fixed !important;
+  bottom: 100px !important;
+  right: 30px !important;
+  left: auto !important;
   width: 350px;
   height: 500px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  z-index: 999;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid #e1e8ed;
+  transform: translateX(0);
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Animación de cierre */
+.chatbot-container.closing {
+  animation: slideOutToRight 0.3s ease-in forwards;
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
 
 .chatbot-header {
@@ -324,16 +385,57 @@
 /* Responsive */
 @media (max-width: 768px) {
   .chatbot-container {
+    width: calc(100vw - 60px);
+    height: calc(100vh - 160px);
+    bottom: 100px;
+    right: 30px;
+    left: 30px;
+    transform: translateX(0);
+    animation: slideInFromBottom 0.3s ease-out;
+  }
+  
+  .chatbot-toggle {
+    bottom: 30px;
+    right: 30px;
+  }
+}
+
+/* Para pantallas grandes, asegurar que esté a la derecha */
+@media (min-width: 769px) {
+  .chatbot-container {
+    right: 30px !important;
+    left: auto !important;
+    transform: translateX(0) !important;
+    animation: slideInFromRight 0.3s ease-out !important;
+  }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .chatbot-container {
     width: calc(100vw - 40px);
     height: calc(100vh - 140px);
     bottom: 90px;
     right: 20px;
     left: 20px;
+    transform: translateX(0);
+    animation: slideInFromBottom 0.3s ease-out;
   }
   
   .chatbot-toggle {
-    bottom: 15px;
-    right: 15px;
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 

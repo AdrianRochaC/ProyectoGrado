@@ -41,7 +41,6 @@ const DetailPage = () => {
         setCourse(found);
       })
       .catch((err) => {
-        console.error("Error al cargar curso:", err);
         alert("Error al cargar curso");
         navigate("/courses");
       });
@@ -74,8 +73,7 @@ const DetailPage = () => {
       .catch((err) => {
         // Si no hay progreso registrado, dejar intentos al máximo
         if (!(err.response && err.response.status === 404)) {
-          console.error("Error al cargar progreso:", err);
-        }
+          }
         setAttemptsLeft(course.attempts);
       });
   }, [course, id, token, user.rol]);

@@ -3,13 +3,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Dashboard.css";
 
-
 const Dashboard = () => {
   const [progress, setProgress] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cargoFiltro, setCargoFiltro] = useState('todos');
-
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -35,7 +33,6 @@ const Dashboard = () => {
       })
       .finally(() => setLoading(false));
   }, []);
-
 
   // Agrupar progreso por usuario (nombre)
   const progressByUser = progress.reduce((acc, item) => {

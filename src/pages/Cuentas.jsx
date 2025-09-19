@@ -67,8 +67,6 @@ const Cuentas = () => {
         setUsers([]);
       }
     } catch (error) {
-      console.error('Error:', error);
-
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
         setError("No se puede conectar con el servidor. Verifica que esté funcionando.");
       } else {
@@ -154,7 +152,6 @@ const Cuentas = () => {
         alert("❌ " + (result.message || 'Error al actualizar usuario'));
       }
     } catch (error) {
-      console.error('Error:', error);
       alert("❌ Error de conexión. Verifica que el servidor esté funcionando.");
     } finally {
       setSaving(false);
@@ -195,7 +192,6 @@ const Cuentas = () => {
         alert("❌ " + (result.message || 'Error al cambiar contraseña'));
       }
     } catch (error) {
-      console.error('Error:', error);
       alert("❌ Error de conexión. Verifica que el servidor esté funcionando.");
     } finally {
       setSaving(false);
@@ -237,7 +233,6 @@ const Cuentas = () => {
         alert("❌ " + (result.message || 'Error al cambiar estado'));
       }
     } catch (error) {
-      console.error('Error:', error);
       alert("❌ Error de conexión. Verifica que el servidor esté funcionando.");
     } finally {
       setSaving(false);

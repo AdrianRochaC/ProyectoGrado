@@ -70,7 +70,6 @@ const AdminDocumentos = () => {
         setRoles(rolesFromDB);
       }
     } catch (err) {
-      console.error('Error cargando usuarios y cargos:', err);
       setUsers([]);
       setRoles([]);
     } finally {

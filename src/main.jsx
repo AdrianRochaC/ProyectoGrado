@@ -10,8 +10,6 @@ const initializeApp = async () => {
     // Intentar cargar preferencias desde la base de datos
     await initializePreferences();
   } catch (error) {
-    console.warn('No se pudieron cargar las preferencias desde el servidor:', error);
-    
     // Usar localStorage como respaldo
     const theme = localStorage.getItem('theme') || 'dark';
     const colorScheme = localStorage.getItem('colorScheme') || 'default';

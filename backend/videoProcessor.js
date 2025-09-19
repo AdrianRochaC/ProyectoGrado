@@ -31,8 +31,6 @@ class VideoProcessor {
    */
   async downloadYouTubeVideo(videoUrl) {
     try {
-      console.log('📹 Descargando video de YouTube:', videoUrl);
-      
       const info = await ytdl.getInfo(videoUrl);
       const title = info.videoDetails.title.replace(/[^\w\s]/gi, '').substring(0, 50);
       const videoId = info.videoDetails.videoId;
@@ -55,11 +53,9 @@ class VideoProcessor {
         ffmpeg(outputPath)
           .toFormat('mp3')
           .on('end', () => {
-            console.log('✅ Audio extraído exitosamente');
             resolve();
           })
           .on('error', (err) => {
-            console.error('❌ Error extrayendo audio:', err);
             reject(err);
           })
           .save(audioPath);
@@ -78,7 +74,6 @@ class VideoProcessor {
       };
       
     } catch (error) {
-      console.error('❌ Error descargando video de YouTube:', error);
       throw error;
     }
   }
@@ -88,8 +83,6 @@ class VideoProcessor {
    */
   async extractAudioFromMP4(videoPath) {
     try {
-      console.log('🎵 Extrayendo audio de archivo MP4:', videoPath);
-      
       const fileName = path.basename(videoPath, path.extname(videoPath));
       const audioPath = path.join(this.tempDir, `${fileName}_${Date.now()}.mp3`);
       
@@ -97,11 +90,9 @@ class VideoProcessor {
         ffmpeg(videoPath)
           .toFormat('mp3')
           .on('end', () => {
-            console.log('✅ Audio extraído del MP4 exitosamente');
             resolve();
           })
           .on('error', (err) => {
-            console.error('❌ Error extrayendo audio del MP4:', err);
             reject(err);
           })
           .save(audioPath);
@@ -110,7 +101,6 @@ class VideoProcessor {
       return audioPath;
       
     } catch (error) {
-      console.error('❌ Error extrayendo audio del MP4:', error);
       throw error;
     }
   }
@@ -120,8 +110,6 @@ class VideoProcessor {
    */
   async transcribeAudio(audioPath) {
     try {
-      console.log('🎙️ Transcribiendo audio con AssemblyAI:', audioPath);
-      
       // Subir archivo a AssemblyAI
       const uploadUrl = await this.assemblyClient.files.upload(audioPath);
       
@@ -145,8 +133,6 @@ class VideoProcessor {
         transcriptResult = await this.assemblyClient.transcripts.get(transcript.id);
       }
       
-      console.log('✅ Transcripción completada');
-      
       // Limpiar archivo temporal
       fs.unlinkSync(audioPath);
       
@@ -160,8 +146,6 @@ class VideoProcessor {
       };
       
     } catch (error) {
-      console.error('❌ Error transcribiendo audio:', error);
-      
       // Limpiar archivo en caso de error
       if (fs.existsSync(audioPath)) {
         fs.unlinkSync(audioPath);
@@ -176,8 +160,6 @@ class VideoProcessor {
    */
   async processYouTubeVideo(videoUrl) {
     try {
-      console.log('🚀 Iniciando procesamiento completo de video de YouTube');
-      
       // Paso 1: Descargar y extraer audio
       const videoData = await this.downloadYouTubeVideo(videoUrl);
       
@@ -195,7 +177,6 @@ class VideoProcessor {
       };
       
     } catch (error) {
-      console.error('❌ Error procesando video de YouTube:', error);
       throw error;
     }
   }
@@ -205,8 +186,6 @@ class VideoProcessor {
    */
   async processMP4Video(videoPath) {
     try {
-      console.log('🚀 Iniciando procesamiento completo de archivo MP4');
-      
       // Paso 1: Extraer audio
       const audioPath = await this.extractAudioFromMP4(videoPath);
       
@@ -229,7 +208,6 @@ class VideoProcessor {
       };
       
     } catch (error) {
-      console.error('❌ Error procesando archivo MP4:', error);
       throw error;
     }
   }
@@ -249,12 +227,10 @@ class VideoProcessor {
         // Eliminar archivos más antiguos de 1 hora
         if (now - stats.mtime.getTime() > 3600000) {
           fs.unlinkSync(filePath);
-          console.log('🗑️ Archivo temporal eliminado:', file);
-        }
+          }
       });
     } catch (error) {
-      console.error('❌ Error limpiando archivos temporales:', error);
-    }
+      }
   }
 }
 

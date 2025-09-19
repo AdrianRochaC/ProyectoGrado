@@ -7,8 +7,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 export default function Notifications({ token }) {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  console.log('[Notifications] notifs:', notifications.length, 'unread:', unreadCount);
-
   useEffect(() => {
     if (token) {
       fetchNotifications();

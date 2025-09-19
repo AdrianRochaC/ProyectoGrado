@@ -16,6 +16,9 @@ import {
 // Importar funciones corregidas de métricas de cargos
 import { getCargoMetrics } from './cargosMetrics.js';
 
+// Importar servicio de reportes Excel
+import excelReportService from './excelReportService.js';
+
 // Importar servicio de IA para generación de preguntas
 import aiService from './aiService.js';
 import videoProcessor from './videoProcessor.js';
@@ -154,7 +157,6 @@ app.post('/api/documents', verifyToken, documentUpload.single('document'), async
     await connection.end();
     res.json({ success: true, message: 'Documento subido exitosamente.' });
   } catch (error) {
-    console.error('Error subiendo documento:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor.' });
   }
 });
@@ -200,7 +202,6 @@ app.get('/api/documents', verifyToken, async (req, res) => {
     await connection.end();
     res.json({ success: true, documents: uniqueDocs });
   } catch (error) {
-    console.error('Error listando documentos:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor.' });
   }
 });
@@ -219,7 +220,6 @@ app.get('/api/documents/:id/targets', verifyToken, async (req, res) => {
     await connection.end();
     res.json({ success: true, roles, users });
   } catch (error) {
-    console.error('Error obteniendo destinatarios:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor.' });
   }
 });
@@ -232,8 +232,6 @@ const dbConfig = {
   password: 'EeSWeqlWTixXiKkLThtMFATmirIsSFmS',
   database: 'railway'
 };
-
-
 
 // === RUTAS DE PREFERENCIAS DE USUARIO ===
 // Obtener preferencias del usuario
@@ -279,7 +277,6 @@ app.get('/api/user-preferences', verifyToken, async (req, res) => {
     res.json({ success: true, preferences: rows[0] });
 
   } catch (error) {
-    console.error('Error obteniendo preferencias:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -344,7 +341,6 @@ app.put('/api/user-preferences', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error actualizando preferencias:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -382,7 +378,6 @@ app.post('/api/user-preferences/reset', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error reseteando preferencias:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -514,14 +509,12 @@ app.post('/api/login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error en login:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
     });
   }
 });
-
 
 // Ruta de registro
 app.post('/api/register', async (req, res) => {
@@ -602,7 +595,6 @@ app.post('/api/register', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error en registro:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -622,7 +614,6 @@ app.get('/api/users', verifyToken, async (req, res) => {
       `SELECT id, nombre, email, rol, activo FROM usuarios ORDER BY nombre`
     );
 
-
     await connection.end();
 
     res.json({
@@ -631,7 +622,6 @@ app.get('/api/users', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al obtener usuarios:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -699,7 +689,6 @@ app.put('/api/users/:id', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al actualizar usuario:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -747,7 +736,6 @@ app.put('/api/users/:id/reset-password', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al cambiar contraseña:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -784,7 +772,6 @@ app.put('/api/users/:id/toggle-status', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al cambiar estado:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -819,7 +806,6 @@ app.get('/api/profile/:id', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al obtener perfil:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -921,7 +907,6 @@ app.post('/api/courses', verifyToken, upload.single('videoFile'), async (req, re
       cargoNombre 
     });
   } catch (error) {
-    console.error('Error creando curso:', error);
     res.status(500).json({ success: false, message: 'Error interno al crear curso' });
   }
 });
@@ -966,7 +951,6 @@ app.get('/api/courses', verifyToken, async (req, res) => {
 
     res.json({ success: true, courses: formattedCourses });
   } catch (error) {
-    console.error('Error al obtener cursos:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -993,7 +977,6 @@ app.get('/api/courses/:id/questions', verifyToken, async (req, res) => {
 
     res.json({ success: true, questions: formatted });
   } catch (error) {
-    console.error('Error al obtener preguntas:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -1018,7 +1001,6 @@ app.delete('/api/courses/:id', verifyToken, async (req, res) => {
 
     res.json({ success: true, message: 'Curso eliminado exitosamente' });
   } catch (error) {
-    console.error('Error al eliminar curso:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -1085,7 +1067,6 @@ app.put('/api/courses/:id', verifyToken, async (req, res) => {
       updatedCourseId: id
     });
   } catch (error) {
-    console.error('Error al actualizar curso:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -1133,8 +1114,6 @@ app.post('/api/progress', verifyToken, async (req, res) => {
     }
 
     // Log para depuración
-    console.log('✅ Progreso guardado correctamente para usuario:', userId, 'curso:', courseId);
-
     // === NOTIFICAR AL ADMIN SI SE COMPLETA ===
     if (videoCompleted || status === 'aprobado' || status === 'reprobado') {
       const [admins] = await connection.execute(
@@ -1161,25 +1140,21 @@ app.post('/api/progress', verifyToken, async (req, res) => {
     try {
       await connection.end();
     } catch (endError) {
-      console.warn('⚠️ Error al cerrar conexión:', endError.message);
-    }
+      }
 
     // Intentar enviar la respuesta JSON
     try {
       return res.json({ success: true, message: 'Progreso guardado correctamente' });
     } catch (jsonErr) {
-      console.error('❌ Error al enviar JSON:', jsonErr.message);
       return res.status(500).send('Error al enviar respuesta');
     }
 
   } catch (error) {
-    console.error('❌ Error en /api/progress:', error);
     if (connection) {
       try {
         await connection.end();
       } catch (endErr) {
-        console.warn('⚠️ Error al cerrar conexión tras fallo:', endErr.message);
-      }
+        }
     }
     return res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
@@ -1208,12 +1183,11 @@ app.get('/api/progress', verifyToken, async (req, res) => {
       [userId]
     );
 
-    console.log("📊 Datos de progreso del usuario:", rows); // LOG PARA CONSOLA
+    // LOG PARA CONSOLA
 
     await connection.end();
     return res.json({ success: true, progress: rows });
   } catch (error) {
-    console.error("❌ Error al obtener progreso:", error);
     if (connection) await connection.end();
     return res.status(500).json({ success: false, message: "Error al obtener progreso" });
   }
@@ -1249,19 +1223,15 @@ app.get('/api/progress/all', verifyToken, async (req, res) => {
        ORDER BY cp.updated_at DESC`
     );
 
-    console.log("📊 Progreso general obtenido:", rows.length, "registros");
-
     await connection.end();
     // Si no hay registros, devolver un array vacío (no 404)
     return res.json({ success: true, progress: rows });
 
   } catch (error) {
-    console.error("❌ Error en /api/progress/all:", error);
     if (connection) await connection.end();
     return res.status(500).json({ success: false, message: "Error al obtener el progreso general." });
   }
 });
-
 
 // Ruta para obtener progreso de un curso específico
 app.get('/api/progress/:courseId', verifyToken, async (req, res) => {
@@ -1286,12 +1256,10 @@ app.get('/api/progress/:courseId', verifyToken, async (req, res) => {
     return res.json({ success: true, progress: progress[0] });
 
   } catch (error) {
-    console.error('❌ Error en /api/progress/:courseId:', error.message);
     if (connection) await connection.end();
     return res.status(500).json({ success: false, message: 'Error interno del servidor.' });
   }
 });
-
 
 // 📋 RUTAS DE BITÁCORA
 
@@ -1307,7 +1275,6 @@ app.get('/api/bitacora', verifyToken, async (req, res) => {
 
     res.json({ success: true, tareas: rows || [] });
   } catch (error) {
-    console.error('Error al obtener tareas:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -1345,7 +1312,6 @@ app.post('/api/bitacora', verifyToken, async (req, res) => {
     await connection.end();
     res.json({ success: true, message: 'Tareas creadas para cada usuario asignado' });
   } catch (error) {
-    console.error('❌ Error creando tareas:', error);
     res.status(500).json({ success: false, message: 'Error interno al crear tarea' });
   }
 });
@@ -1401,7 +1367,6 @@ app.put('/api/bitacora/:id', verifyToken, async (req, res) => {
     await connection.end();
     res.json({ success: true });
   } catch (error) {
-    console.error('❌ Error actualizando tarea:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -1418,7 +1383,6 @@ app.get('/api/usuarios', verifyToken, async (req, res) => {
   }
 });
 
-
 app.delete('/api/bitacora/:id', verifyToken, async (req, res) => {
   const { rol } = req.user;
   if (rol !== 'Admin') return res.status(403).json({ success: false, message: 'Solo Admin puede eliminar' });
@@ -1434,7 +1398,6 @@ app.delete('/api/bitacora/:id', verifyToken, async (req, res) => {
 
     res.json({ success: true, message: 'Tarea eliminada' });
   } catch (error) {
-    console.error('Error al eliminar tarea:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
@@ -1458,10 +1421,168 @@ app.get('/api/cargos', verifyToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error obteniendo cargos:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
+    });
+  }
+});
+
+// Generar reporte Excel de cargos
+app.get('/api/cargos/reporte-excel', verifyToken, async (req, res) => {
+  try {
+    // Verificar que el usuario sea admin
+    if (req.user.rol !== 'Admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Solo los administradores pueden generar reportes'
+      });
+    }
+
+    const connection = await mysql.createConnection(dbConfig);
+    
+    // Obtener datos completos de cargos con estadísticas detalladas
+    const [cargos] = await connection.execute(`
+      SELECT 
+        c.*,
+        COUNT(DISTINCT u.id) as usuarios_count,
+        COUNT(CASE WHEN u.activo = 1 THEN 1 END) as usuarios_activos,
+        COUNT(CASE WHEN u.activo = 0 THEN 1 END) as usuarios_inactivos,
+        (SELECT COUNT(*) FROM courses WHERE role = c.nombre) as cursos_count,
+        (SELECT COUNT(DISTINCT d.id) FROM documents d 
+         JOIN document_targets dt ON d.id = dt.document_id 
+         WHERE dt.target_type = 'role' AND dt.target_value = c.nombre) as documentos_count,
+        (SELECT COUNT(*) FROM course_progress cp 
+         JOIN usuarios u2 ON cp.user_id = u2.id 
+         WHERE u2.cargo_id = c.id AND cp.evaluation_status = 'aprobado') as cursos_aprobados,
+        (SELECT ROUND(AVG(
+          CASE 
+            WHEN cp.evaluation_score IS NOT NULL AND cp.evaluation_total > 0 
+            THEN (cp.evaluation_score / cp.evaluation_total) * 100
+            ELSE 0 
+          END
+        ), 2) FROM course_progress cp 
+         JOIN usuarios u3 ON cp.user_id = u3.id 
+         WHERE u3.cargo_id = c.id) as promedio_progreso,
+        (SELECT ROUND(AVG(cp.attempts_used), 2) FROM course_progress cp 
+         JOIN usuarios u4 ON cp.user_id = u4.id 
+         WHERE u4.cargo_id = c.id AND cp.attempts_used > 0) as intentos_promedio,
+        (SELECT ROUND(
+          (COUNT(CASE WHEN cp.evaluation_status = 'aprobado' THEN 1 END) * 100.0 / 
+           NULLIF(COUNT(cp.id), 0)), 2
+        ) FROM course_progress cp 
+         JOIN usuarios u5 ON cp.user_id = u5.id 
+         WHERE u5.cargo_id = c.id) as tasa_aprobacion
+      FROM cargos c
+      LEFT JOIN usuarios u ON u.cargo_id = c.id
+      GROUP BY c.id
+      ORDER BY c.nombre ASC
+    `);
+    
+    await connection.end();
+
+    // Generar reporte Excel
+    const workbook = await excelReportService.generateCargosReport(cargos);
+    const buffer = await excelReportService.generateExcelBuffer(workbook);
+
+    // Configurar headers para descarga
+    const fileName = `Reporte_Cargos_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.setHeader('Content-Length', buffer.length);
+    
+    res.send(buffer);
+
+  } catch (error) {
+    console.error('Error generando reporte Excel:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error generando reporte Excel'
+    });
+  }
+});
+
+// Generar reporte Excel individual de un cargo
+app.get('/api/cargos/:id/reporte-excel', verifyToken, async (req, res) => {
+  try {
+    // Verificar que el usuario sea admin
+    if (req.user.rol !== 'Admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Solo los administradores pueden generar reportes'
+      });
+    }
+
+    const cargoId = req.params.id;
+    const connection = await mysql.createConnection(dbConfig);
+    
+    // Obtener datos completos del cargo específico
+    const [cargos] = await connection.execute(`
+      SELECT 
+        c.*,
+        COUNT(DISTINCT u.id) as usuarios_count,
+        COUNT(CASE WHEN u.activo = 1 THEN 1 END) as usuarios_activos,
+        COUNT(CASE WHEN u.activo = 0 THEN 1 END) as usuarios_inactivos,
+        (SELECT COUNT(*) FROM courses WHERE role = c.nombre) as cursos_count,
+        (SELECT COUNT(DISTINCT d.id) FROM documents d 
+         JOIN document_targets dt ON d.id = dt.document_id 
+         WHERE dt.target_type = 'role' AND dt.target_value = c.nombre) as documentos_count,
+        (SELECT COUNT(*) FROM course_progress cp 
+         JOIN usuarios u2 ON cp.user_id = u2.id 
+         WHERE u2.cargo_id = c.id AND cp.evaluation_status = 'aprobado') as cursos_aprobados,
+        (SELECT ROUND(AVG(
+          CASE 
+            WHEN cp.evaluation_score IS NOT NULL AND cp.evaluation_total > 0 
+            THEN (cp.evaluation_score / cp.evaluation_total) * 100
+            ELSE 0 
+          END
+        ), 2) FROM course_progress cp 
+         JOIN usuarios u3 ON cp.user_id = u3.id 
+         WHERE u3.cargo_id = c.id) as promedio_progreso,
+        (SELECT ROUND(AVG(cp.attempts_used), 2) FROM course_progress cp 
+         JOIN usuarios u4 ON cp.user_id = u4.id 
+         WHERE u4.cargo_id = c.id AND cp.attempts_used > 0) as intentos_promedio,
+        (SELECT ROUND(
+          (COUNT(CASE WHEN cp.evaluation_status = 'aprobado' THEN 1 END) * 100.0 / 
+           NULLIF(COUNT(cp.id), 0)), 2
+        ) FROM course_progress cp 
+         JOIN usuarios u5 ON cp.user_id = u5.id 
+         WHERE u5.cargo_id = c.id) as tasa_aprobacion
+      FROM cargos c
+      LEFT JOIN usuarios u ON u.cargo_id = c.id
+      WHERE c.id = ?
+      GROUP BY c.id
+    `, [cargoId]);
+    
+    if (cargos.length === 0) {
+      await connection.end();
+      return res.status(404).json({
+        success: false,
+        message: 'Cargo no encontrado'
+      });
+    }
+    
+    await connection.end();
+
+    // Generar reporte Excel individual
+    const workbook = await excelReportService.generateIndividualCargoReport(cargos[0]);
+    const buffer = await excelReportService.generateExcelBuffer(workbook);
+
+    // Configurar headers para descarga
+    const fileName = `Reporte_${cargos[0].nombre.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.setHeader('Content-Length', buffer.length);
+    
+    res.send(buffer);
+
+  } catch (error) {
+    console.error('Error generando reporte individual:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error generando reporte individual'
     });
   }
 });
@@ -1508,7 +1629,6 @@ app.get('/api/cargos', verifyToken, async (req, res) => {
       });
       
     } catch (error) {
-      console.error('Error creando cargo:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor'
@@ -1572,7 +1692,6 @@ app.put('/api/cargos/:id', verifyToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error actualizando cargo:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -1629,7 +1748,6 @@ app.delete('/api/cargos/:id', verifyToken, async (req, res) => {
   });
   
 } catch (error) {
-  console.error('Error eliminando cargo:', error);
   res.status(500).json({
     success: false,
     message: 'Error interno del servidor'
@@ -1641,10 +1759,7 @@ app.delete('/api/cargos/:id', verifyToken, async (req, res) => {
 app.get('/api/cargos/:id/metrics', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('🔍 SOLICITUD DE MÉTRICAS PARA CARGO ID:', id);
-    
     const metrics = await getCargoMetrics(id);
-    console.log('✅ MÉTRICAS ENVIADAS AL FRONTEND:', JSON.stringify(metrics, null, 2));
     
     res.json({
       success: true,
@@ -1652,7 +1767,6 @@ app.get('/api/cargos/:id/metrics', verifyToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Error obteniendo métricas del cargo:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -1677,7 +1791,6 @@ app.get('/api/cargos/activos', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error obteniendo cargos:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -1710,7 +1823,6 @@ app.get('/api/cargos/para-cursos', verifyToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error obteniendo cargos para cursos:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -1736,13 +1848,8 @@ app.post('/api/courses/:id/generate-questions', verifyToken, async (req, res) =>
     const { id } = req.params;
     const { numQuestions = 5 } = req.body;
 
-    console.log('🤖 SOLICITUD DE GENERACIÓN DE PREGUNTAS CON IA PARA CURSO ID:', id);
-    console.log('📊 Número de preguntas solicitadas:', numQuestions);
-
     // Generar preguntas usando IA
     const questions = await aiService.generateQuestionsForCourse(parseInt(id));
-    
-    console.log('✅ PREGUNTAS GENERADAS CON IA:', questions.length);
     
     res.json({
       success: true,
@@ -1752,7 +1859,6 @@ app.post('/api/courses/:id/generate-questions', verifyToken, async (req, res) =>
     });
 
   } catch (error) {
-    console.error('❌ Error generando preguntas con IA:', error);
     res.status(500).json({
       success: false,
       message: 'Error generando preguntas con IA: ' + error.message
@@ -1780,10 +1886,6 @@ app.post('/api/ai/generate-questions', verifyToken, async (req, res) => {
       });
     }
 
-    console.log('🤖 SOLICITUD DE GENERACIÓN DE PREGUNTAS PERSONALIZADAS CON IA');
-    console.log('📚 Título:', title);
-    console.log('📊 Número de preguntas solicitadas:', numQuestions);
-
     // Preparar datos del curso
     const courseData = {
       title,
@@ -1795,8 +1897,6 @@ app.post('/api/ai/generate-questions', verifyToken, async (req, res) => {
     // Generar preguntas usando IA
     const questions = await aiService.generateQuestions(courseData, numQuestions);
     
-    console.log('✅ PREGUNTAS PERSONALIZADAS GENERADAS CON IA:', questions.length);
-    
     res.json({
       success: true,
       message: `Se generaron ${questions.length} preguntas personalizadas`,
@@ -1804,7 +1904,6 @@ app.post('/api/ai/generate-questions', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error generando preguntas personalizadas con IA:', error);
     res.status(500).json({
       success: false,
       message: 'Error generando preguntas personalizadas con IA: ' + error.message
@@ -1832,10 +1931,6 @@ app.post('/api/ai/analyze-youtube', verifyToken, async (req, res) => {
       });
     }
 
-    console.log('📹 ANALIZANDO VIDEO DE YOUTUBE:', videoUrl);
-    console.log('📚 Título personalizado:', title || 'Auto-generado');
-    console.log('📊 Número de preguntas solicitadas:', numQuestions);
-
     // Extraer información del video de YouTube
     const videoData = await aiService.extractYouTubeTranscript(videoUrl);
     
@@ -1850,8 +1945,6 @@ app.post('/api/ai/analyze-youtube', verifyToken, async (req, res) => {
     // Generar preguntas usando IA
     const questions = await aiService.generateQuestions(courseData, numQuestions);
     
-    console.log('✅ PREGUNTAS GENERADAS PARA VIDEO DE YOUTUBE:', questions.length);
-    
     res.json({
       success: true,
       message: `Se generaron ${questions.length} preguntas para el video de YouTube`,
@@ -1860,7 +1953,6 @@ app.post('/api/ai/analyze-youtube', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error analizando video de YouTube:', error);
     res.status(500).json({
       success: false,
       message: 'Error analizando video de YouTube: ' + error.message
@@ -1889,10 +1981,6 @@ app.post('/api/ai/analyze-video-file', upload.single('videoFile'), verifyToken, 
     const { title, description, numQuestions = 5 } = req.body;
     const videoPath = req.file.path;
 
-    console.log('🎬 ANALIZANDO ARCHIVO DE VIDEO:', req.file.originalname);
-    console.log('📚 Título personalizado:', title || 'Auto-generado');
-    console.log('📊 Número de preguntas solicitadas:', numQuestions);
-
     // Analizar contenido del archivo de video con transcripción real
     const videoData = await aiService.processMP4WithTranscription(videoPath);
     
@@ -1907,8 +1995,6 @@ app.post('/api/ai/analyze-video-file', upload.single('videoFile'), verifyToken, 
     // Generar preguntas usando IA
     const questions = await aiService.generateQuestions(courseData, numQuestions);
     
-    console.log('✅ PREGUNTAS GENERADAS PARA ARCHIVO DE VIDEO:', questions.length);
-    
     res.json({
       success: true,
       message: `Se generaron ${questions.length} preguntas para el archivo de video`,
@@ -1922,7 +2008,6 @@ app.post('/api/ai/analyze-video-file', upload.single('videoFile'), verifyToken, 
     });
 
   } catch (error) {
-    console.error('❌ Error analizando archivo de video:', error);
     res.status(500).json({
       success: false,
       message: 'Error analizando archivo de video: ' + error.message
@@ -1950,10 +2035,6 @@ app.post('/api/ai/analyze-file', verifyToken, async (req, res) => {
       });
     }
 
-    console.log('📄 ANALIZANDO ARCHIVO:', filePath);
-    console.log('📚 Título personalizado:', title || 'Auto-generado');
-    console.log('📊 Número de preguntas solicitadas:', numQuestions);
-
     // Analizar contenido del archivo
     const fileData = await aiService.analyzeFileContent(filePath);
     
@@ -1968,8 +2049,6 @@ app.post('/api/ai/analyze-file', verifyToken, async (req, res) => {
     // Generar preguntas usando IA
     const questions = await aiService.generateQuestions(courseData, numQuestions);
     
-    console.log('✅ PREGUNTAS GENERADAS PARA ARCHIVO:', questions.length);
-    
     res.json({
       success: true,
       message: `Se generaron ${questions.length} preguntas para el archivo`,
@@ -1978,7 +2057,6 @@ app.post('/api/ai/analyze-file', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error analizando archivo:', error);
     res.status(500).json({
       success: false,
       message: 'Error analizando archivo: ' + error.message
@@ -1998,8 +2076,6 @@ app.post('/api/chatbot', verifyToken, async (req, res) => {
         message: 'El mensaje no puede estar vacío'
       });
     }
-
-    console.log('🤖 Solicitud de chatbot médico:', message);
 
     // Preparar historial de conversación
     const messages = [
@@ -2024,8 +2100,6 @@ app.post('/api/chatbot', verifyToken, async (req, res) => {
 
     const botResponse = completion.choices[0].message.content.trim();
     
-    console.log('✅ Respuesta del chatbot generada');
-
     res.json({
       success: true,
       response: botResponse,
@@ -2033,7 +2107,6 @@ app.post('/api/chatbot', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error en chatbot:', error);
     res.status(500).json({
       success: false,
       message: 'Error procesando la consulta del chatbot'
@@ -2056,7 +2129,6 @@ app.get('/api/chatbot/history', verifyToken, async (req, res) => {
       history: rows
     });
   } catch (error) {
-    console.error('❌ Error obteniendo historial del chatbot:', error);
     res.status(500).json({
       success: false,
       message: 'Error obteniendo historial de conversaciones'
@@ -2081,7 +2153,6 @@ app.post('/api/chatbot/save', verifyToken, async (req, res) => {
       message: 'Conversación guardada exitosamente'
     });
   } catch (error) {
-    console.error('❌ Error guardando conversación:', error);
     res.status(500).json({
       success: false,
       message: 'Error guardando conversación'
@@ -2095,11 +2166,8 @@ setInterval(() => {
 }, 3600000); // 1 hora
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`🎬 Sistema de transcripción de videos habilitado`);
-  console.log(`📁 Directorio temporal: ./temp/videos`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
-
 
 // Exportar para uso
 export default app;

@@ -25,11 +25,9 @@ const Register = () => {
           setSelectedCargoId(data.cargos[0].id);
         }
       } else {
-        console.error('Error obteniendo cargos');
-      }
+        }
     } catch (error) {
-      console.error('Error:', error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
@@ -67,7 +65,6 @@ const Register = () => {
         alert("❌ " + result.message);
       }
     } catch (error) {
-      console.error("Error:", error);
       alert("❌ Error de conexión. Verifica que el servidor esté funcionando.");
     }
   };

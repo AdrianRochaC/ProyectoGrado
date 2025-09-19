@@ -70,7 +70,6 @@ const Login = () => {
       }
 
     } catch (error) {
-      console.error("Error:", error);
       alert("❌ Error de conexión. Verifica que el servidor esté funcionando.");
     } finally {
       setLoading(false);

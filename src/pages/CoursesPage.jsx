@@ -16,8 +16,6 @@ const CoursesPage = () => {
     loadCourses();
   }, []);
 
-
-
   // Función para cargar cursos (refactorizada)
   const loadCourses = async () => {
     try {
@@ -52,8 +50,7 @@ const CoursesPage = () => {
         alert("Error al cargar cursos");
       }
     } catch (err) {
-      console.error("Error al cargar cursos:", err);
-    }
+      }
   };
 
   // Función para asegurar que la URL esté en formato embed

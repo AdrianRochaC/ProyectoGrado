@@ -53,8 +53,7 @@ const AdminCoursesPage = () => {
         }
       }
     } catch (error) {
-      console.error('Error obteniendo cargos:', error);
-    }
+      }
   };
 
   const fetchCourses = () => {
@@ -159,8 +158,7 @@ const AdminCoursesPage = () => {
         alert(data.message);
       }
     } catch (err) {
-      console.error("Error al enviar curso:", err);
-    }
+      }
   };
 
   const resetForm = () => {
@@ -217,8 +215,6 @@ const AdminCoursesPage = () => {
         return;
       }
 
-      console.log('🤖 Generando preguntas con IA para nuevo curso:', title);
-      
       // Preparar datos del curso para la IA
       let courseData = {
         title: title,
@@ -245,8 +241,6 @@ const AdminCoursesPage = () => {
 
           if (response.ok) {
             const data = await response.json();
-            console.log('✅ Preguntas generadas con IA para video de YouTube:', data);
-            
             // Convertir las preguntas al formato del formulario
             const formattedQuestions = data.questions.map(q => ({
               question: q.question,
@@ -260,8 +254,7 @@ const AdminCoursesPage = () => {
             return;
           }
         } catch (error) {
-          console.error('❌ Error analizando video de YouTube:', error);
-        }
+          }
       }
 
       // Si es archivo de video, usar análisis específico
@@ -289,8 +282,6 @@ const AdminCoursesPage = () => {
             
             if (response.ok) {
               const data = await response.json();
-              console.log('✅ Preguntas generadas con IA para archivo de video:', data);
-              
               const formattedQuestions = data.questions.map(q => ({
                 question: q.question,
                 options: q.options,
@@ -304,8 +295,7 @@ const AdminCoursesPage = () => {
             }
           }
         } catch (error) {
-          console.error('❌ Error analizando archivo de video:', error);
-        }
+          }
       }
 
       // Si es archivo de documento o solo texto, usar el endpoint general
@@ -326,8 +316,6 @@ const AdminCoursesPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Preguntas generadas con IA:', data);
-        
         // Convertir las preguntas al formato del formulario
         const formattedQuestions = data.questions.map(q => ({
           question: q.question,
@@ -344,7 +332,6 @@ const AdminCoursesPage = () => {
       }
       
     } catch (error) {
-      console.error('❌ Error generando preguntas con IA:', error);
       alert(`❌ Error: ${error.message}`);
     } finally {
       setLoading(false);
@@ -386,7 +373,6 @@ const AdminCoursesPage = () => {
         alert(`❌ Error: ${data.message || "No se pudo eliminar el curso."}`);
       }
     } catch (error) {
-      console.error("Error al eliminar curso:", error);
       alert("❌ Error al eliminar el curso. Intenta nuevamente.");
     }
   };
@@ -424,7 +410,6 @@ const AdminCoursesPage = () => {
           setQuestions([]);
         }
       } catch (err) {
-        console.error("❌ Error al cargar preguntas:", err);
         setQuestions([]);
       }
     }

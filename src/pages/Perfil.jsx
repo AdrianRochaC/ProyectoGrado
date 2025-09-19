@@ -28,13 +28,12 @@ const Perfil = () => {
         const result = await response.json();
         if (result.success) {
           setProgress(result.progress);
-          console.log("📊 Progreso obtenido del backend:", result.progress); // LOG
+          // LOG
         }
       }
 
       setLoading(false);
     } catch (error) {
-      console.error("❌ Error cargando perfil o progreso:", error);
       setLoading(false);
     }
   };
@@ -137,7 +136,6 @@ const Perfil = () => {
             )}
           </div>
         )}
-
 
         {/* Nota informativa */}
         <div className="perfil-card info-card">
