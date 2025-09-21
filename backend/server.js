@@ -19,8 +19,7 @@ import { getCargoMetrics } from './cargosMetrics.js';
 // Importar servicio de reportes Excel
 import excelReportService from './excelReportService.js';
 
-// Importar servicio de IA para generación de preguntas
-import aiService from './aiService.js';
+// Importar servicio de video y OpenAI
 import videoProcessor from './videoProcessor.js';
 import OpenAI from 'openai';
 
@@ -67,12 +66,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Servir la carpeta de videos como archivos estáticos (pública, antes de autenticación)
-app.use('/uploads/videos', express.static('uploads/videos'));
+app.use('/uploads/videos', express.static(path.join(process.cwd(), '..', 'uploads/videos')));
 
 // Configuración de almacenamiento para videos
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/videos/'); // Carpeta donde se guardarán los videos
+    cb(null, path.join(process.cwd(), '..', 'uploads/videos')); // Carpeta donde se guardarán los videos
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -82,7 +81,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Crear carpeta uploads/documents si no existe
-const documentsDir = 'uploads/documents';
+const documentsDir = path.join(process.cwd(), '..', 'uploads/documents');
 if (!fs.existsSync(documentsDir)) {
   fs.mkdirSync(documentsDir, { recursive: true });
 }
