@@ -146,6 +146,9 @@ const AdminCargos = () => {
     if (!confirm('¿Estás seguro de que quieres ELIMINAR este cargo? Esta acción no se puede deshacer.')) {
       return;
     }
+    if (!confirm('Advertencia: Se desactivarán los usuarios del cargo, se eliminarán cursos/preguntas/progresos asociados, se quitarán asignaciones de documentos por este rol y se borrarán documentos huérfanos no globales. ¿Deseas continuar?')) {
+      return;
+    }
 
     try {
       const token = localStorage.getItem('authToken');

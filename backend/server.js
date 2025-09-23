@@ -6,6 +6,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 // Agregar importación de los endpoints de preferencias
 import {
@@ -26,6 +27,10 @@ import OpenAI from 'openai';
 const app = express();
 const PORT = 3001;
 const JWT_SECRET = 'tu_clave_secreta_jwt'; // En producción usar variable de entorno
+
+// Compatibilidad __dirname en módulos ES
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configuración de OpenAI para el chatbot
 const openai = new OpenAI({
@@ -65,13 +70,25 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Servir la carpeta de videos como archivos estáticos (pública, antes de autenticación)
-app.use('/uploads/videos', express.static(path.join(process.cwd(), '..', 'uploads/videos')));
+// Directorios de uploads dentro de backend
+const videosDir = path.join(__dirname, 'uploads', 'videos');
+const documentsDir = path.join(__dirname, 'uploads', 'documents');
+
+// Crear carpetas si no existen
+if (!fs.existsSync(videosDir)) {
+  fs.mkdirSync(videosDir, { recursive: true });
+}
+if (!fs.existsSync(documentsDir)) {
+  fs.mkdirSync(documentsDir, { recursive: true });
+}
+
+// Servir las carpetas como archivos estáticos (públicas)
+app.use('/uploads/videos', express.static(videosDir));
 
 // Configuración de almacenamiento para videos
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(process.cwd(), '..', 'uploads/videos')); // Carpeta donde se guardarán los videos
+    cb(null, videosDir); // Carpeta donde se guardarán los videos
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -79,12 +96,6 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage: storage });
-
-// Crear carpeta uploads/documents si no existe
-const documentsDir = path.join(process.cwd(), '..', 'uploads/documents');
-if (!fs.existsSync(documentsDir)) {
-  fs.mkdirSync(documentsDir, { recursive: true });
-}
 
 // Configuración de Multer para documentos
 const documentStorage = multer.diskStorage({
@@ -1792,60 +1803,105 @@ app.put('/api/cargos/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Eliminar cargo completamente
+// Eliminar cargo con limpieza en cascada y desactivación de usuarios
 app.delete('/api/cargos/:id', verifyToken, async (req, res) => {
+  let connection;
   try {
     const { id } = req.params;
-    
-    const connection = await mysql.createConnection(dbConfig);
-    
-    // Verificar si el cargo existe
-    const [existingCargo] = await connection.execute(
-      'SELECT id FROM cargos WHERE id = ?',
+
+    connection = await mysql.createConnection(dbConfig);
+    await connection.beginTransaction();
+
+    // 1) Verificar cargo y obtener su nombre
+    const [cargoRows] = await connection.execute(
+      'SELECT id, nombre FROM cargos WHERE id = ?',
       [id]
     );
-    
-    if (existingCargo.length === 0) {
+    if (cargoRows.length === 0) {
+      await connection.rollback();
       await connection.end();
-      return res.status(400).json({
-        success: false,
-        message: 'Cargo no encontrado'
-      });
+      return res.status(404).json({ success: false, message: 'Cargo no encontrado' });
     }
-    
-    // Verificar que no haya usuarios asignados a este cargo
-    const [usersWithCargo] = await connection.execute(
-      'SELECT COUNT(*) as count FROM usuarios WHERE cargo_id = ?',
-      [id]
+    const cargoNombre = cargoRows[0].nombre;
+
+    // 2) Desactivar usuarios del cargo y limpiar relación
+    await connection.execute('UPDATE usuarios SET activo = 0 WHERE cargo_id = ?', [id]);
+    await connection.execute('UPDATE usuarios SET cargo_id = NULL WHERE cargo_id = ?', [id]);
+
+    // 3) Eliminar cursos del cargo (y dependencias)
+    const [courseIdsRows] = await connection.execute(
+      'SELECT id FROM courses WHERE role = ?',
+      [cargoNombre]
     );
-    
-    if (usersWithCargo[0].count > 0) {
-      await connection.end();
-      return res.status(400).json({
-        success: false,
-        message: 'No se puede eliminar el cargo porque tiene usuarios asignados'
-      });
+    const courseIds = courseIdsRows.map(r => r.id);
+    if (courseIds.length > 0) {
+      const inClause = '(' + courseIds.map(() => '?').join(',') + ')';
+      // Eliminar progreso primero por seguridad
+      await connection.execute(
+        `DELETE FROM course_progress WHERE course_id IN ${inClause}`,
+        courseIds
+      );
+      // Eliminar preguntas
+      await connection.execute(
+        `DELETE FROM questions WHERE course_id IN ${inClause}`,
+        courseIds
+      );
+      // Eliminar cursos
+      await connection.execute(
+        `DELETE FROM courses WHERE id IN ${inClause}`,
+        courseIds
+      );
     }
-    
-    // Eliminar cargo completamente
+
+    // 4) Quitar asignaciones de documentos por este rol
     await connection.execute(
-      'DELETE FROM cargos WHERE id = ?',
-      [id]
+      `DELETE FROM document_targets WHERE target_type = 'role' AND target_value = ?`,
+      [cargoNombre]
     );
-    
+
+    // 5) Borrar documentos huérfanos no globales (sin targets)
+    const [orphanDocs] = await connection.execute(
+      `SELECT d.id, d.filename FROM documents d
+       LEFT JOIN document_targets dt ON dt.document_id = d.id
+       WHERE d.is_global = 0
+       GROUP BY d.id, d.filename
+       HAVING COUNT(dt.id) = 0`
+    );
+    if (orphanDocs.length > 0) {
+      const orphanIds = orphanDocs.map(d => d.id);
+      const inClauseDocs = '(' + orphanIds.map(() => '?').join(',') + ')';
+      await connection.execute(
+        `DELETE FROM documents WHERE id IN ${inClauseDocs}`,
+        orphanIds
+      );
+      // Intentar borrar archivos físicos (no crítico para la transacción)
+      try {
+        const docsDir = path.join(process.cwd(), 'backend', 'uploads', 'documents');
+        for (const doc of orphanDocs) {
+          const filePath = path.join(docsDir, doc.filename);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        }
+      } catch {}
+    }
+
+    // 6) Eliminar el cargo
+    await connection.execute('DELETE FROM cargos WHERE id = ?', [id]);
+
+    await connection.commit();
     await connection.end();
-    
-      res.json({
-    success: true,
-    message: 'Cargo eliminado exitosamente'
-  });
-  
-} catch (error) {
-  res.status(500).json({
-    success: false,
-    message: 'Error interno del servidor'
-  });
-}
+
+    res.json({ success: true, message: 'Cargo eliminado y datos relacionados limpiados' });
+  } catch (error) {
+    try {
+      if (connection) {
+        await connection.rollback();
+        await connection.end();
+      }
+    } catch {}
+    res.status(500).json({ success: false, message: 'Error eliminando cargo: ' + error.message });
+  }
 });
 
 // Obtener métricas de un cargo específico (versión corregida)
