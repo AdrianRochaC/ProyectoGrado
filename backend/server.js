@@ -8,6 +8,10 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import dotenv from 'dotenv';
+
+// Cargar variables de entorno
+dotenv.config();
 // Agregar importación de los endpoints de preferencias
 import {
   updateBackgroundImage,
@@ -328,13 +332,12 @@ app.delete('/api/documents/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Configuración de la base de datos
 const dbConfig = {
-  host: 'centerbeam.proxy.rlwy.net',
-  port: 22529,
-  user: 'root',
-  password: 'EeSWeqlWTixXiKkLThtMFATmirIsSFmS',
-  database: 'railway'
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'proyecto_grado'
 };
 
 // === RUTAS DE PREFERENCIAS DE USUARIO ===
@@ -2256,9 +2259,10 @@ app.post('/api/chatbot', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error en chatbot:', error);
     res.status(500).json({
       success: false,
-      message: 'Error procesando la consulta del chatbot'
+      message: 'Error procesando la consulta del chatbot: ' + error.message
     });
   }
 });
