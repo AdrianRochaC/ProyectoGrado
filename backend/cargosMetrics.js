@@ -1,4 +1,4 @@
-import { executeQuery, checkConnectionHealth } from '../db-setup/connection-manager.js';
+import { executeQuery, checkConnectionHealth } from './db-setup/connection-manager.js';
 
 // Obtener métricas de un cargo específico (versión corregida)
 export async function getCargoMetrics(cargoId) {
