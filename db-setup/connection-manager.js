@@ -1,11 +1,11 @@
 const mysql = require('mysql2/promise');
 
 const dbConfig = {
-  host: 'centerbeam.proxy.rlwy.net',
-  port: 22529,
+  host: 'localhost',
+  port: 3306,
   user: 'root',
-  password: 'EeSWeqlWTixXiKkLThtMFATmirIsSFmS',
-  database: 'railway',
+  password: '',
+  database: 'proyecto_grado',
   // Configuraciones para mejorar la estabilidad de la conexión
   acquireTimeout: 60000,
   timeout: 60000,

@@ -1,11 +1,41 @@
 .login-wrapper {
-  background-color: var(--bg-primary);
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 2rem;
   font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #a8e063, #56ab2f); /* Fondo verde degradado */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.login-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: 1.2px;
+  color: #ffffff;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 0 10px rgba(255, 255, 255, 0.2),
+    0 0 20px rgba(255, 255, 255, 0.1);
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+}
+
+.login-title span {
+  color: #eaffea;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .login-container {
@@ -16,6 +46,7 @@
   border-radius: var(--radius-large);
   box-shadow: var(--shadow-card);
   border: 1px solid var(--border-primary);
+  z-index: 1;
 }
 
 .login-container h1 {

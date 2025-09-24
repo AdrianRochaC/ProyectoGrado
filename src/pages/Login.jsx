@@ -9,12 +9,9 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Limpiar estilos personalizados al cargar la página de login
   useEffect(() => {
-    // Solo si NO hay usuario autenticado
     const user = localStorage.getItem('user');
     if (!user || user === 'null') {
-      // Limpiar preferencias del localStorage
       localStorage.removeItem('theme');
       localStorage.removeItem('colorScheme');
       localStorage.removeItem('fontSize');
@@ -27,7 +24,6 @@ const Login = () => {
       localStorage.removeItem('storageCleared');
       localStorage.removeItem('backgroundImageTooLarge');
 
-      // Restablecer estilos del DOM
       document.documentElement.setAttribute('data-theme', 'dark');
       document.documentElement.setAttribute('data-color-scheme', 'default');
       document.documentElement.setAttribute('data-font-size', 'medium');
@@ -54,16 +50,10 @@ const Login = () => {
       const result = await response.json();
 
       if (result.success) {
-        // ✅ Guardar token y datos de usuario
         localStorage.setItem("authToken", result.token);
         localStorage.setItem("user", JSON.stringify(result.user));
-
-        // Inicializar/aplicar preferencias personalizadas del usuario
         await initializePreferences();
-
         alert("✅ Bienvenido " + result.user.nombre);
-
-        // Redirigir siempre a Home
         navigate("/home");
       } else {
         alert("❌ " + (result.message || "Credenciales incorrectas"));
@@ -78,6 +68,9 @@ const Login = () => {
 
   return (
     <div className="login-wrapper">
+      <h2 className="login-title">
+        Bienvenido a <span>Capacitaciones Davivir</span>
+      </h2>
       <div className="login-container">
         <h1>Iniciar Sesión</h1>
         <form className="login-form" onSubmit={handleLogin}>
