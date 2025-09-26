@@ -4,11 +4,11 @@ const uploadMemory = multer({ storage: multer.memoryStorage() });
 
 // Configuración de la base de datos
 const dbConfig = {
-  host: 'centerbeam.proxy.rlwy.net',
-  port: 22529,
-  user: 'root',
-  password: 'EeSWeqlWTixXiKkLThtMFATmirIsSFmS',
-  database: 'railway'
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'proyecto_grado'
 };
 
 // Obtener preferencias de un usuario (ahora incluye has_background_image)
